@@ -1,0 +1,44 @@
+Emulation
+Method:
+                container
+sender <----> [ reciever ] enter the container: downlink  leave the container: up link
+
+Hint: Mahimahi wraps reciever and create some specific status: loss rate 
+
+1. if downlink-queue is specified to 'droptail' or 'drophead' and limited in length,
+    rlcc will suffer a greatly unbearable loss_rate(90% +). I argue that the abnornal sending_rate (too fast) 
+    puts much preesure on the queue and finally causes a full-length queue.
+
+# Can agent truly learn the policy?
+
+2. Neural Network is intended to choose the action 0: keep the cwnd halved at the beginning state settings. We change the 
+index:0 to represent other actions, e.g. *2, +0, however, it still shows its preference to index 0. Unknown reason.
+
+3. We set a lower boundary and a upper boundary for cwnd.
+
+
+
+to try:
+1. Sarsa
+Sarsa possesses a better convegence.(slightly loss flucuation)
+And episode increases as the train time elapses, but slowly.
+mm-delay 50 mm-link 60mbps.trace 60mbps.trace --uplink-queue=droptail --uplink-queue-args=packets=1 --downlink-queue=droptail --downlink-queue-args=packets=1
+
+
+2. standard DQN's neural network, no deed for too complex one.
+* fully connected neural layer with each of the two hidden layer containing 200 neurons(relu)
+* fully connected neural network with three hidden layers consisting of 100, 50, and 25 hidden units with tanh nonlinearities.
+
+3. learning rate decayananan
+4. Action space: upper/lower bounds have big affect on the output of NN. Design some algorithms to generate a more efficient one refering pic in QQ group.
+
+A parameterized neural network is designed to be an agent to maximize the value in the desision process. 
+In order to get the optimal performance, we lanched an empiracle study to find the best setting and the
+most suitable for our neural network. In our design and implementation, we adopted a three-layer perceptron 
+with one one-dimentional convolutional layer and two fully connectted layers,that is, 
+one hidden layer and one output layer. Convolutional layers is used to extract features from time series
+ input data. /*Data will be flatten after it flow through the convolutional layer.*/
+ The hidden layer contains 512 hidden units and utilizes Relu nonlinearity.
+ To get the expected value of each action, the output layer includes 5 neurons corresponding to the 
+ dimention of action space. Action is chosen by the matching maximum value of output layer.
+
