@@ -37,7 +37,7 @@ There are some problems in current version of code.
 
 ### 训练流程
 ```
- train_maml.py->algo(根据设置选择MAML/NORML/NORML+OFFSET等等一系列算法)->algo.train->maml_rl.py->采样inner_tasks(就是获得batch大小的环境变量，模拟不同的环境变化)-> 
+ ./agent/norml/train_maml.py->algo(根据设置选择MAML/NORML/NORML+OFFSET等等一系列算法)->algo.train->maml_rl.py->采样inner_tasks(就是获得batch大小的环境变量，模拟不同的环境变化)-> 
  在外循环下（小于num_outer_iterations）         
     判断终止条件（效果好 early_termination函数 /达到步数）         
     否则在内循环下 for task_idx in range(self.tasks_batch_size)
