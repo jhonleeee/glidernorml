@@ -62,7 +62,6 @@ def run_sender(agent, env, agent_config):
             # act
             next_state, reward, done, tput = env.step(action)
             state = next_state
-
             if agent_config.debug:
                 perf_file.write("state: ")
                 for state in np.array(state):
@@ -183,19 +182,16 @@ def train_norml(self,session,env,agentt,num_outer_iterations=1,dont_update_weigh
       tf.logging.info('iteration: %d', agent.mamlrl.current_step)
       print('iteration: %d' % agent.mamlrl.current_step)
       if not self.fixed_tasks:
-        inner_tasks = random.sample(self.task_env_modifiers,
-                                    self.tasks_batch_size)
-
+        inner_tasks = random.sample(agent.mamlrl.task_env_modifiers, agent.mamlrl.tasks_batch_size)#add modifier to task baths
       # If we do rollouts locally, don't parallelize inner train loops
       results = []
       for task_idx in range(self.tasks_batch_size):
         results.append(self.train_inner((session, inner_tasks, task_idx)))
-
       samples = {}
       avg_train_reward = 0.
       avg_test_reward = 0.
 
-      for task_idx in range(self.tasks_batch_size):
+      for task_idx in range(self.tasks_batch_size):#maml run n*k times
         # training rollouts
         train_rollouts, train_reward, test_rollouts, test_reward = results[
             task_idx]

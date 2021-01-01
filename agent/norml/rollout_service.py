@@ -70,12 +70,13 @@ class RolloutServiceLocal(object):
 
       envs = []
       for _ in range(num_rollouts):
-        envs.append(wrap_task_generator(self.task_generator))
+        #envs.append(wrap_task_generator(self.task_generator))#TODO:Check if wrapper is useful
+        envs.append(self.task_generator)
 
       self._batch_envs[num_rollouts] = tools.BatchEnv(envs, blocking=False)
 
     batch_env = self._batch_envs[num_rollouts]
-    # apply task_modifier
+    # apply task_modifier(meant to creat different tasks, make model )
     for attr in task_modifier:
       batch_env.set_attribute(attr, task_modifier[attr], single=True)#add modifier to env
     return batch_env
@@ -90,7 +91,7 @@ class RolloutServiceLocal(object):
 
     Args:
       session: tf session.
-      num_parallel_rollouts: number of parallel rollout processes
+      num_parallel_rollouts: number of parallel rollout processes（To speed up computation, our MAML and NoRML implementations are parallelized across tasks and rollouts.）
       policy: policy to deploy.
       task_modifier: gym env modifier function.
       sample_vars: dict with arguments to pass to the sampling function (tf).

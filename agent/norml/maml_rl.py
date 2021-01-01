@@ -1,20 +1,7 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+
 
 """NoRML (No-Reward Meta Learning) Implementation.
-
 See the original paper at:
 https://arxiv.org/pdf/1903.01063.pdf
 See documentation in train_maml.py for how to run
@@ -55,7 +42,7 @@ class MAMLReinforcementLearning(object):
     self.config = config
     self.logdir = logdir
     self.save_config = save_config
-    self._configure()
+    self._configure()#init training config
     self._construct_network()
     self._create_summaries()
     self._create_savers()
@@ -511,7 +498,7 @@ class MAMLReinforcementLearning(object):
             session,
             num_outer_iterations=1,
             dont_update_weights=False,
-            ignore_termination=False):#bring to run_sender.py
+            ignore_termination=False):
     """Performs one or multiple training steps.
 
     Per task: rollout train samples, rollout test samples
@@ -529,42 +516,42 @@ class MAMLReinforcementLearning(object):
     Raises:
       ValueError: if the loss is NaN
     """
-    inner_tasks = random.sample(self.task_env_modifiers, self.tasks_batch_size)
+    inner_tasks = random.sample(self.task_env_modifiers, self.tasks_batch_size)#generate a batch of env modifiers(env modify)
     done = False
     avg_test_reward = np.NaN
-    for step in range(self.current_step,
+    for step in range(self.current_step,#from config
                       self.current_step + num_outer_iterations):
       if ignore_termination:
         done = False
       elif self.current_step >= self.num_outer_iterations:
         done = True
-      elif self.early_termination is not None:
+      elif self.early_termination is not None:#terminate when perform is good engough
         done = self.early_termination(self.avg_test_reward_log)
       if done:
         break
-      self.current_step = step + 1
+      self.current_step = step + 1 #step of this batch
       tf.logging.info('iteration: %d', self.current_step)
       print('iteration: %d' % self.current_step)
-      if not self.fixed_tasks:
+      if not self.fixed_tasks:#if true,each rollout has a fixed horizon of 10 steps,
         inner_tasks = random.sample(self.task_env_modifiers,
                                     self.tasks_batch_size)
 
       # If we do rollouts locally, don't parallelize inner train loops
       results = []
       for task_idx in range(self.tasks_batch_size):
-        results.append(self.train_inner((session, inner_tasks, task_idx)))
+        results.append(self.train_inner((session, inner_tasks, task_idx)))#train every modified env in the batch and save the result
 
-      samples = {}
+      samples = {}#is a dict
       avg_train_reward = 0.
       avg_test_reward = 0.
 
       for task_idx in range(self.tasks_batch_size):
         # training rollouts
         train_rollouts, train_reward, test_rollouts, test_reward = results[
-            task_idx]
+            task_idx]#get a rollout
         avg_train_reward += train_reward
         avg_test_reward += test_reward
-
+        #pile all task rollouts in samples
         samples[self.inner_train_inputs[task_idx]] = train_rollouts['states']
         samples[self.inner_train_next_inputs[task_idx]] = train_rollouts[
             'next_states']
@@ -576,7 +563,7 @@ class MAMLReinforcementLearning(object):
         samples[self.inner_test_actions[task_idx]] = test_rollouts['actions']
         samples[
             self.inner_test_advantages[task_idx]] = test_rollouts['advantages']
-
+        
       # Normalize advantage for easier parameter tuning
       samples[self.inner_test_advantages[task_idx]] -= np.mean(
           samples[self.inner_test_advantages[task_idx]])
@@ -591,7 +578,7 @@ class MAMLReinforcementLearning(object):
         if self.outer_lr_decay:
           samples[self.outer_lr_ph] = self.outer_lr_init * (
               1. - float(step) / self.num_outer_iterations)
-        session.run(self.apply_grads_outer, samples)
+        session.run(self.apply_grads_outer, samples)#do outter traning
       print('avg train reward: %f' % avg_train_reward)
       print('avg test reward: %f' % avg_test_reward)
       tf.logging.info('avg train reward: %f', avg_train_reward)
@@ -640,14 +627,34 @@ class MAMLReinforcementLearning(object):
     """
     session, inner_tasks, task_idx = args
     feed_dict = {}
-    task = inner_tasks[task_idx]
+    task = inner_tasks[task_idx]#inner task(modifier) 
     train_rollouts = self.rollout_service.perform_rollouts(
         session, self.num_inner_rollouts, self.train_policies[task_idx], task,
-        feed_dict)
+        feed_dict)#the rollout of a task
+   '''
+          Returns:
+      rollouts: dict per rollout:
+        timesteps: numpy array of timesteps and total rollout length:
+          [(0, 200), (1, 200)...]
+        states: numpy array of states (t_0...t_N): (N+1)xN_states
+        actions: numpy array of actions (t_0...t_N-1): NxN_actions
+        rewards: numpy array of rewards (t_0...t_N-1): Nx1
+    '''
     # note: this modifies the train_rollouts variable to include advantages
     self._update_value_function(task_idx, train_rollouts)
+     """Update the value function estimator. Uses the baseline from RLLab."""
     self._compute_returns_and_values(task_idx, train_rollouts)
+      """Computes discounted returns and estimate values function."""
     train_reward = self._compute_advantages(train_rollouts)
+      """Computes advantage values for a list of rollouts.
+
+    Args:
+      rollouts: list of rollouts. Each rollout is a dict with 'reward' and
+        'state' arrays.
+
+    Returns:
+      the average return value of all rollouts
+    """
     train_rollouts_flat = self._flatten_rollouts(
         train_rollouts, no_reward=self.learn_advantage_function_inner)
 
@@ -659,14 +666,17 @@ class MAMLReinforcementLearning(object):
     if not self.learn_advantage_function_inner:
       feed_dict[self.inner_train_advantages[task_idx]] = train_rollouts_flat[
           'advantages']
-
+'''
+Feed Dict
+'''
     test_rollouts = self.rollout_service.perform_rollouts(
         session, self.num_inner_rollouts, self.test_policies[task_idx], task,
         feed_dict)
-    self._update_value_function(task_idx, test_rollouts)
-    self._compute_returns_and_values(task_idx, test_rollouts)
-    test_reward = self._compute_advantages(test_rollouts)
-    test_rollouts_flat = self._flatten_rollouts(test_rollouts)
+    self._update_value_function(task_idx, test_rollouts)#update 
+        """Update the value function estimator. Uses the baseline from RLLab."""
+    self._compute_returns_and_values(task_idx, test_rollouts)#return 
+    test_reward = self._compute_advantages(test_rollouts)#reward
+    test_rollouts_flat = self._flatten_rollouts(test_rollouts)#flat
     print('Task {}: train_rewards: {}, test_reward: {}'.format(
         task_idx, train_reward, test_reward))
     return train_rollouts_flat, train_reward, test_rollouts_flat, test_reward

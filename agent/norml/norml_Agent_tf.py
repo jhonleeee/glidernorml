@@ -13,6 +13,7 @@ class Norml(object):
     def observe(self, state, action, reward, done):
         pass
     def get_action(self, s_t):
+        
         pass
     def update_target_q_network(self):
         pass

@@ -75,9 +75,9 @@ class AgentIcoConfig(object):
 
 class EnvironmentConfig(object):
     # step length
-    step_len_ms = 10
-    state_dim = 4
-    action_dim = 5
+    step_len_ms = 10#
+    state_dim = 4#send rate,deliver rate,cwnd,rtt
+    action_dim = 5#
     debug = True
     action_list = ["+0.0", "-100.0", "+100.0", "+1000.0", "/2.0"]
     init_cwnd = 10
