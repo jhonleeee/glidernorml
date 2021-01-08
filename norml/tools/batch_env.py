@@ -146,7 +146,9 @@ class BatchEnv(object):
 
   def handshake(self):
     '''for glider, perform handshake in a batch of sender'''
-    for index,sender in enumerate(self._envs):
-      if isinstance(sender,Sender):
-        print("Sender No.%d start handshaking...",index)
-        sender.handshake()
+    #for index,sender in enumerate(self._envs):
+      #if isinstance(sender,Sender):
+        #print(type(sender))
+    print("[norml_batchEnv] Sender No.%d start handshaking..." %(0))
+    self._envs[0].handshake()
+    print("[norml_batchEnv] Sender No.%d suss in handshaking..." %(0))

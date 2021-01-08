@@ -3,7 +3,6 @@
 import argparse
 import project_root
 from env.receiver import Receiver
-from env.sender import Sender
 
 def main():
     parser = argparse.ArgumentParser()

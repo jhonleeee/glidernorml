@@ -62,7 +62,14 @@ class RolloutServiceLocal(object):
       def wrap_task_generator(task_generator):
         """Provides getter and setter functions to access wrapped environments."""
         wrap = tools.wrappers
-        limit_duration_env = wrap.LimitDuration(task_generator(),
+        #for glider, instantiate sender and handshake before wrapped into a process
+        task_generator_instance = task_generator()
+        print("_______________hand shake")
+        task_generator_instance.handshake()
+        print("_______________hand shake finish")
+        #limit_duration_env = wrap.LimitDuration(task_generator(),
+                                                #self.max_rollout_len)#add duration limit to rollout
+        limit_duration_env = wrap.LimitDuration(task_generator_instance,
                                                 self.max_rollout_len)#add duration limit to rollout
         range_normalize_env = wrap.RangeNormalize(limit_duration_env)#normalize env states and rewars
         clip_action_env = wrap.ClipAction(range_normalize_env)#when action is out of range, cut it into spaces
@@ -111,7 +118,8 @@ class RolloutServiceLocal(object):
     actions = [[] for _ in range(num_parallel_rollouts)]#make place holder
     rewards = [[] for _ in range(num_parallel_rollouts)]
     sample_op, state_var = policy.sample_op()
-
+    
+    #batch_env.handshake()#for glider, handshake all senders before start perform inner rollout
     completed_states = []
     completed_actions = []
     completed_rewards = []

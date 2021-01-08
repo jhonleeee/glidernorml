@@ -195,7 +195,6 @@ class Sender(object):
 
     def take_action(self, action_idx):
         op, val = self.action_mapping[action_idx]
-
         self.cwnd = int(apply_op(op, self.cwnd, val))
         self.cwnd = max(2.0, self.cwnd)
         self.cwnd = min(self.cwnd, 100000)
@@ -274,12 +273,12 @@ class Sender(object):
 
     def step(self, action):
         print("taking action...")
-        print(action)
+        print(action,'  ->  ',np.argmax(action))
+        action = np.argmax(action)#for norml:action now is a 5dims arr
         self.take_action(action)
         while not self.step_end:
             self.run()
         self.step_end = False
-
         if len(self.tput_buf) > self.done_start:
             bad_tput_cnt = len([i for i in self.tput_buf[-self.last_entries_num:] if i <= self.bad_tput_threshold])
             bad_tput_fraction = float(bad_tput_cnt) / float(self.last_entries_num)
