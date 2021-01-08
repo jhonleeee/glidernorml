@@ -1,0 +1,7 @@
+.idea/
+models/
+*.pyc
+models-11.1/
+results/
+commit_msg
+data/
