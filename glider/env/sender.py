@@ -12,6 +12,7 @@ import Queue
 from glidernorml.glider.helpers.helpers import (
     curr_ts_ms, apply_op, format_actions, class_vars, get_average,
     READ_FLAGS, ERR_FLAGS, READ_ERR_FLAGS, WRITE_FLAGS, ALL_FLAGS)
+from gym import spaces
 
 class Sender(object):
     def __init__(self, config, port):
@@ -78,6 +79,21 @@ class Sender(object):
         self.step_end = False
         self.reset_flag = False
 
+        '''for glider: set gym space'''
+        highInf = np.array([#limit observation scope
+            np.finfo(np.float32).max,
+            np.finfo(np.float32).max,
+            np.finfo(np.float32).max,
+            np.finfo(np.float32).max])
+        highOnes = np.array([#limit observation scope
+            1,
+            1,
+            1,
+            1,
+            1])
+        self.observation_space = spaces.Box(-highInf, highInf, dtype=np.float32)
+        #self.action_space = spaces.Discrete(5)
+        self.action_space = spaces.Box(-highOnes,highOnes,dtype=np.float32)#gym like action space
 
     def cleanup(self):
         self.sock.close()
@@ -257,6 +273,8 @@ class Sender(object):
                 self.recv_cnt += 1
 
     def step(self, action):
+        print("taking action...")
+        print(action)
         self.take_action(action)
         while not self.step_end:
             self.run()

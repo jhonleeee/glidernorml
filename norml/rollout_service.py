@@ -33,6 +33,7 @@ class RolloutServiceLocal(object):
     self.task_generator = self.config.task_generator
     self.always_full_rollouts = self.config.always_full_rollouts
     self.max_rollout_len = self.config.max_rollout_len
+    self.action_to_index = True#for glider,pick action index to env(sender) !not used,deal in batch_enc.py
 
   def _get_batch_env(self, task_modifier, num_rollouts):
     """Creates or reuses a batch environment for a task.

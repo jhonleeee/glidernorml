@@ -98,11 +98,11 @@ class BatchEnv(object):
     """
     actions = action
     for index, (env, action) in enumerate(zip(self._envs, actions)):
-      #if self.action_to_index:
-        #action = np.argmax(action)#select likly action from action arr
       if not env.action_space.contains(action):
         message = 'Invalid action at index {}: {}'
         raise ValueError(message.format(index, action))
+      #if self.action_to_index:#change arr of actions to index
+        #action = np.argmax(action)
     if self._blocking:
       transitions = [
           env.step(action)

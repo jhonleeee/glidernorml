@@ -31,6 +31,7 @@ import random
 import numpy as np
 import tensorflow.compat.v1 as tf
 
+from gym import spaces
 from glidernorml.norml import networks
 from glidernorml.norml import policies
 from glidernorml.norml.envs import cartpole_sensor_bias_env
@@ -377,6 +378,7 @@ GLIDER_CC_DR = dict(
     max_num_batch_env=1000,
     max_rollout_len=500,
     log_every=10,
+    action_to_index=True#pass env a index or a arr of protentials
 )
 GLIDER_CC_MAML = GLIDER_CC_DR.copy()
 GLIDER_CC_MAML.update(
