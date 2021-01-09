@@ -117,6 +117,7 @@ class BatchEnv(object):
     reward = np.stack(rewards)
     done = np.stack(dones)
     info = tuple(infos)
+    print('[nmorml_batch_env]_observe ',observ,'---reward',reward)
     return observ, reward, done, info
 
   def reset(self, indices=None):

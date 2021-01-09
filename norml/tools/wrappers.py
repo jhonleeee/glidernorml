@@ -56,7 +56,8 @@ class RangeNormalize(AttributeModifier):
 
   def __init__(self, env):
     self._env = env
-    self._should_normalize_observ = self._is_finite(self._env.observation_space)
+    #self._should_normalize_observ = self._is_finite(self._env.observation_space)
+    self._should_normalize_observ = False#TODO:find why it change boseve to all -1
     if not self._should_normalize_observ:
       tf.logging.info('Not normalizing infinite observation range.')
     self._should_normalize_action = self._is_finite(self._env.action_space)
@@ -143,6 +144,7 @@ class LimitDuration(AttributeModifier):
     if self._step >= self._duration:
       done = True
       self._step = None
+    print('[wrapper_limitDuration]_observe ',observ,'---reward',reward)
     return observ, reward, done, info
 
   def reset(self):

@@ -272,8 +272,7 @@ class Sender(object):
                 self.recv_cnt += 1
 
     def step(self, action):
-        print("taking action...")
-        print(action,'  ->  ',np.argmax(action))
+        print("[sender]",action,'  ->  ',np.argmax(action))
         action = np.argmax(action)#for norml:action now is a 5dims arr
         self.take_action(action)
         while not self.step_end:
@@ -284,6 +283,7 @@ class Sender(object):
             bad_tput_fraction = float(bad_tput_cnt) / float(self.last_entries_num)
             if bad_tput_fraction > 0.9:
                 self.done = True
+        print('[Sender]__State',self.state)
         return self.state, self.reward, self.done, self.tput
 
     def reset(self):

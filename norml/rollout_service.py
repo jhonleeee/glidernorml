@@ -114,6 +114,7 @@ class RolloutServiceLocal(object):
     """
     batch_env = self._get_batch_env(task_modifier, num_parallel_rollouts)#NOTI:make a midified gym env
     state = batch_env.reset().reshape((num_parallel_rollouts, -1))
+    print('[norml_roolout]_initState',state)
     states = [[state[idx]] for idx in range(num_parallel_rollouts)]
     actions = [[] for _ in range(num_parallel_rollouts)]#make place holder
     rewards = [[] for _ in range(num_parallel_rollouts)]
@@ -133,6 +134,7 @@ class RolloutServiceLocal(object):
       action = session.run(sample_op, sample_vars)#feed state and fetch sample_op
       action = np.nan_to_num(action, copy=False)
       new_state, reward, new_tasks_done, _ = batch_env.step(action)#take action
+      print('[norml_rollout]New State:',new_state)
       for idx in range(num_parallel_rollouts):
         states[idx].append(new_state[idx:idx + 1].ravel())
         actions[idx].append(action[idx:idx + 1, :])
