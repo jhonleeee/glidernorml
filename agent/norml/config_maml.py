@@ -36,7 +36,7 @@ from norml import policies
 from norml.envs import cartpole_sensor_bias_env
 #from norml.envs import halfcheetah_motor_env
 from norml.envs import move_point_env
-
+from glidernorml import env
 
 def _early_termination_avg(rewards, num_steps, avg_reward):
   """Early termination based on average reward."""

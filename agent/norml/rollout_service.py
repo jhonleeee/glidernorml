@@ -59,7 +59,7 @@ class RolloutServiceLocal(object):
         num_deleted += 1
 
       def wrap_task_generator(task_generator):
-         """Provides getter and setter functions to access wrapped environments."""
+        """Provides getter and setter functions to access wrapped environments."""
         wrap = tools.wrappers
         limit_duration_env = wrap.LimitDuration(task_generator(),
                                                 self.max_rollout_len)#add duration limit to rollout

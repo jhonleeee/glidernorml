@@ -631,7 +631,7 @@ class MAMLReinforcementLearning(object):
     train_rollouts = self.rollout_service.perform_rollouts(
         session, self.num_inner_rollouts, self.train_policies[task_idx], task,
         feed_dict)#the rollout of a task
-   '''
+    """
           Returns:
       rollouts: dict per rollout:
         timesteps: numpy array of timesteps and total rollout length:
@@ -639,14 +639,14 @@ class MAMLReinforcementLearning(object):
         states: numpy array of states (t_0...t_N): (N+1)xN_states
         actions: numpy array of actions (t_0...t_N-1): NxN_actions
         rewards: numpy array of rewards (t_0...t_N-1): Nx1
-    '''
+    """
     # note: this modifies the train_rollouts variable to include advantages
     self._update_value_function(task_idx, train_rollouts)
-     """Update the value function estimator. Uses the baseline from RLLab."""
+    """Update the value function estimator. Uses the baseline from RLLab."""
     self._compute_returns_and_values(task_idx, train_rollouts)
-      """Computes discounted returns and estimate values function."""
+    """Computes discounted returns and estimate values function."""
     train_reward = self._compute_advantages(train_rollouts)
-      """Computes advantage values for a list of rollouts.
+    """Computes advantage values for a list of rollouts.
 
     Args:
       rollouts: list of rollouts. Each rollout is a dict with 'reward' and
@@ -666,14 +666,14 @@ class MAMLReinforcementLearning(object):
     if not self.learn_advantage_function_inner:
       feed_dict[self.inner_train_advantages[task_idx]] = train_rollouts_flat[
           'advantages']
-'''
-Feed Dict
-'''
+    '''
+    Feed Dict
+    '''
     test_rollouts = self.rollout_service.perform_rollouts(
         session, self.num_inner_rollouts, self.test_policies[task_idx], task,
         feed_dict)
     self._update_value_function(task_idx, test_rollouts)#update 
-        """Update the value function estimator. Uses the baseline from RLLab."""
+    """Update the value function estimator. Uses the baseline from RLLab."""
     self._compute_returns_and_values(task_idx, test_rollouts)#return 
     test_reward = self._compute_advantages(test_rollouts)#reward
     test_rollouts_flat = self._flatten_rollouts(test_rollouts)#flat

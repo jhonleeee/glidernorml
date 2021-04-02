@@ -255,7 +255,7 @@ class Sender(object):
                 self.recv()
                 self.recv_cnt += 1
 
-    def step(self, action):#NOTE:strp
+    def step(self, action):#NOTE:step
         self.take_action(action)
         while not self.step_end:
             self.run()

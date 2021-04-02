@@ -9,10 +9,11 @@ from __future__ import print_function
 from absl import flags
 from dotmap import DotMap
 import tensorflow.compat.v1 as tf
-
+import sys
+sys.path.append('/home/lilimul/Documents/norml/glidernorml/agent/norml')
 from norml import config_maml
 from norml import maml_rl
-tf.compat.v1.disable_eager_execution()
+
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string('config', 'RL_PENDULUM_GYM_CONFIG_META',
